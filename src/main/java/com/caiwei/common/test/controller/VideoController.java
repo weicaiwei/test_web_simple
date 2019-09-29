@@ -54,10 +54,10 @@ public class VideoController {
                 response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
                 //设定文件读取开始位置（以字节为单位）
                 targetFile.seek(range);
-            }else {////如果rangeString为空，证明是播放视频发来的请求
+            }else {////如果rangeString为空，证明是下载视频发来的请求
                 log.info("请求视频文件下载");
                 //设置响应头，把文件名字设置好
-                response.setHeader("Content-Disposition", "attachment; filename=caiwei.mp4" );
+                response.setHeader("Content-Disposition", "attachment; filename="+fileName );
                 //设置文件长度
                 response.setHeader("Content-Length", String.valueOf(fileLength));
                 //解决编码问题
@@ -72,7 +72,6 @@ public class VideoController {
         }else{
             String message = "file:"+fileName+" not exists";
             log.error(message);
-            //解决编码问题
             response.setHeader("Content-Type","application/json");
             outputStream.write(message.getBytes(StandardCharsets.UTF_8));
         }
