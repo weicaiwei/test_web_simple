@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="utils_server.js"></script>
+    <script src="index.js"></script>
+</head>
+<body>
+<div id="testId" style="color: crimson" >
+    <button id="ghdgdgdigidg">点我</button>
+    <img src="./images/tupian1.jpg" alt="">
+    <div>
+        <div id="testSon" style="display: inline-block;">
+            <p>母猪的产后护理</p>
+        </div>
+        <div id="testSon2" style="float: left; display: inline-block;">
+            <p>的</p>
+        </div>
+        <div id="testSon3" style="float: right; display: inline-block;">
+            <p>护</p>
+        </div>
+    </div>
+
+</div>
+<script>
+    console.log(document.getElementById("testId").innerText);
+    console.log(document.getElementById("testId").innerHTML);
+    const changeColor = () => {
+        let testDivStyle = document.getElementById("testId").style;
+        testDivStyle.color = "blue";
+    };
+    document.createElement("div");
+    const testDiv = document.getElementById('testId');
+    console.log(testDiv.children);
+    const imgDiv = testDiv.getElementsByTagName("img")[0];
+    console.log(imgDiv);
+    console.log(imgDiv.src);
+    console.log(imgDiv.getAttribute("src"));
+    document.getElementById("testId").onclick = changeColor;
+</script>
+
+</body>
+</html>

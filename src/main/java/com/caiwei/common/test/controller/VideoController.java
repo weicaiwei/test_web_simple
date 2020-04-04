@@ -1,6 +1,7 @@
 package com.caiwei.common.test.controller;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.RandomAccessFile;
 import java.nio.charset.StandardCharsets;
+import java.util.concurrent.Semaphore;
 
 /**
  * @ClassName: VideoController
@@ -27,55 +29,79 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 public class VideoController {
 
-    @RequestMapping("video/{fileName}")
-    public void download(HttpServletRequest request, HttpServletResponse response,  @PathVariable String fileName) throws IOException {
+    private Semaphore semaphore = new Semaphore(1);
 
-        //清空缓存
-        response.reset();
-        //获取响应的输出流
-        OutputStream outputStream = response.getOutputStream();
-        File file = new File("D:\\temp\\" + fileName);
-        if (file.exists()) {
-            //创建随机读取文件对象
-            RandomAccessFile targetFile = new RandomAccessFile(file, "r");
-            long fileLength = targetFile.length();
-            //获取从那个字节开始读取文件
-            String rangeString = request.getHeader("Range");
-            if (rangeString != null) {//如果rangeString不为空，证明是播放视频发来的请求
-                long range = Long.valueOf(rangeString.substring(rangeString.indexOf("=") + 1, rangeString.indexOf("-")));
-                log.info("请求视频播放流，从字节："+range+" 开始");
-                //设置内容类型
-                response.setHeader("Content-Type", "video/mp4");
-                //设置此次相应返回的数据长度
-                response.setHeader("Content-Length", String.valueOf(fileLength - range));
-                //设置此次相应返回的数据范围
-                response.setHeader("Content-Range", "bytes "+range+"-"+(fileLength-1)+"/"+fileLength);
-                //返回码需要为206，而不是200
-                response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-                //设定文件读取开始位置（以字节为单位）
-                targetFile.seek(range);
-            }else {////如果rangeString为空，证明是下载视频发来的请求
-                log.info("请求视频文件下载");
-                //设置响应头，把文件名字设置好
-                response.setHeader("Content-Disposition", "attachment; filename="+fileName );
-                //设置文件长度
-                response.setHeader("Content-Length", String.valueOf(fileLength));
-                //解决编码问题
-                response.setHeader("Content-Type","application/octet-stream");
+    @Value("${filePath}")
+    private String filePath;
 
+    @RequestMapping("video/caiwei")
+    public void download(HttpServletRequest request, HttpServletResponse response)  {
+
+        try {
+            /*semaphore.acquire();//并没有起到预想中的作用*/
+            //清空缓存
+            response.reset();
+            //获取响应的输出流
+            OutputStream outputStream = response.getOutputStream();
+            System.out.println("filePath:"+filePath);
+            File file = new File(filePath );
+            if (file.exists()) {
+                //创建随机读取文件对象
+                RandomAccessFile targetFile = new RandomAccessFile(file, "r");
+                long fileLength = targetFile.length();
+                //获取从那个字节开始读取文件
+                String rangeString = request.getHeader("Range");
+                if (rangeString != null) {//如果rangeString不为空，证明是播放视频发来的请求
+                    long range = Long.valueOf(rangeString.substring(rangeString.indexOf("=") + 1, rangeString.indexOf("-")));
+                    log.info("请求视频播放流，从字节："+range+" 开始");
+                    //设置内容类型
+                    response.setHeader("Content-Type", "video/mp4");
+                    //设置此次相应返回的数据长度
+                    response.setHeader("Content-Length", String.valueOf(fileLength - range));
+                    //设置此次相应返回的数据范围
+                    response.setHeader("Content-Range", "bytes "+range+"-"+(fileLength-1)+"/"+fileLength);
+                    //返回码需要为206，而不是200
+                    response.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
+                    //设定文件读取开始位置（以字节为单位）
+                    targetFile.seek(range);
+                }else {////如果rangeString为空，证明是下载视频发来的请求
+                    log.info("请求视频文件下载");
+                    //设置响应头，把文件名字设置好
+                    response.setHeader("Content-Disposition", "attachment; filename=caiwei.mp4" );
+                    //设置文件长度
+                    response.setHeader("Content-Length", String.valueOf(fileLength));
+                    //解决编码问题
+                    response.setHeader("Content-Type","application/octet-stream");
+
+                }
+                byte[] cache = new byte[1024 * 1024];
+                int flag;
+                int count = 0;
+                while ((flag = targetFile.read(cache))!=-1){
+                    count++;
+                    System.out.println(Thread.currentThread().getName()+"循环"+count+"次数");
+                    outputStream.write(cache, 0, flag);
+                }
+            }else{
+                String message = "file:caiwei.mp4 not exists";
+                log.error(message);
+                response.setHeader("Content-Type","application/json");
+                outputStream.write(message.getBytes(StandardCharsets.UTF_8));
+                outputStream.flush();
             }
-            byte[] cache = new byte[1024 * 300];
-            int flag;
-            while ((flag = targetFile.read(cache))!=-1){
-                outputStream.write(cache, 0, flag);
-            }
-        }else{
-            String message = "file:"+fileName+" not exists";
-            log.error(message);
-            response.setHeader("Content-Type","application/json");
-            outputStream.write(message.getBytes(StandardCharsets.UTF_8));
+
+            outputStream.close();
+        } catch (IOException e) {
+            log.error("服务器异常",e);
+        } finally {
+            /*semaphore.release();*/
         }
-        outputStream.flush();
-        outputStream.close();
+
     }
+
+/*    @RequestMapping("/{fileName}")
+    public void nginxRedirectVideo(HttpServletRequest request, HttpServletResponse response,  @PathVariable String fileName) {
+        System.out.println("进入java服务器");
+        response.setHeader("X-Accel-Redirect", "/local/"+fileName);
+    }*/
 }
