@@ -7,6 +7,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 import java.util.Random;
+import java.util.concurrent.locks.AbstractQueuedSynchronizer;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * @ClassName: TimedTask
@@ -31,5 +33,15 @@ public class TimedTask {
         log.warn("这是warn级别的输出");
         log.error("这是error级别的输出");*/
 
+    }
+
+    public synchronized void method1() {
+        //TODO
+    }
+
+    public void method2() {
+        synchronized (this) {
+            //TODO
+        }
     }
 }

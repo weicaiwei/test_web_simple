@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
  * @date 2020-01-01
  */
 @Data
-@PropertySource(value = "classpath:config/config.properties", encoding = "utf-8")
+@PropertySource(value = "classpath:config.properties", encoding = "utf-8")
 @ConfigurationProperties("custom.caiwei")
 @Component
 public class Caiwei {

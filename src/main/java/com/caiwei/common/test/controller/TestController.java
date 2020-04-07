@@ -35,6 +35,8 @@ public class TestController {
 
     @GetMapping("test1")
     public String test1(@RequestParam String param1, @RequestParam String param2) {
+        log.debug("param1[{}],param2[{}]", param1, param2);
+
         log.info("param1[{}],param2[{}]", param1, param2);
         return testService.getTest(param1,param2);
     }

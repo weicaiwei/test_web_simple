@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--scan:当此属性设置为true时，配置文件如果发生改变，将会被重新加载，默认值为true-->
+<!--scanPeriod:设置监测配置文件是否有修改的时间间隔，如果没有给出时间单位，默认单位是毫秒。当scan为true时，此属性生效。默认的时间间隔为1分钟-->
+<!--debug:当此属性设置为true时，将打印出logback内部日志信息，实时查看logback运行状态。默认值为false-->
+<configuration scan="true" scanPeriod="60 seconds" debug="false">>
+
+    <!-- 日志保留天数 -->
+    <property name="log.maxHistory" value="30"/>
+
+    <!-- 日志文件分割大小 -->
+    <property name="log.maxFileSize" value="5MB"/>
+
+    <property name="log.pattern"
+              value="%d{yyyy-MM-dd HH:mm:ss:SSS} [%thread] %-5level %logger{50} - %msg%n"/>
+
+    <property name="log.filePath" value="./log"/>
+
+    <!-- 彩色日志依赖的渲染类 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter" />
+    <conversionRule conversionWord="wEx"
+                    converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter" />
+    <!-- 彩色日志格式 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="${CONSOLE_LOG_PATTERN:-%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} %clr(${LOG_LEVEL_PATTERN:-%5p}) %clr(${PID:- }){magenta} %clr(---){faint} %clr([%15.15t]){faint} %clr(%-40.40logger{39}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}}" />
+
+
+    <!-- 控制台输出 -->
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <!-- encoder 默认配置为PatternLayoutEncoder -->
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender-->
+    <appender name="debug" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 同时按照每天和大小来分割日志文件, 这种方式pattern中必须包含 %d 和%i -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件名称 , 日志输出位置  可相对、和绝对路径 -->
+            <fileNamePattern>${log.filePath}/%d{yyyy-MM-dd}/debug_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <!-- 文件保存天数 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+            <!-- 单个文件大小 -->
+            <maxFileSize>${log.maxFileSize}</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <!-- 过滤器，只记录DEBUG以上级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>DEBUG</level>
+        </filter>
+    </appender>
+
+    <!-- 滚动记录文件，先将日志记录到指定文件，当符合某个条件时，将日志记录到其他文件 RollingFileAppender-->
+    <appender name="info" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 同时按照每天和大小来分割日志文件, 这种方式pattern中必须包含 %d 和%i -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件名称 , 日志输出位置  可相对、和绝对路径 -->
+            <fileNamePattern>${log.filePath}/%d{yyyy-MM-dd}/info_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <!-- 文件保存天数 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+            <!-- 单个文件大小 -->
+            <maxFileSize>${log.maxFileSize}</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+         <!-- 过滤器，只记录DEBUG以上级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+    </appender>
+
+    <!-- WARN ERROR 级别的日志,输出到文件-->
+    <appender name="warnAndError" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 同时按照每天和大小来分割日志文件, 这种方式pattern中必须包含 %d 和%i -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件名称 -->
+            <fileNamePattern>${log.filePath}/%d{yyyy-MM-dd}/error_%d{yyyy-MM-dd}_%i.log</fileNamePattern>
+            <!-- 文件保存天数 -->
+            <maxHistory>${log.maxHistory}</maxHistory>
+            <!-- 单个文件大小 -->
+            <maxFileSize>${log.maxFileSize}</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>${log.pattern}</pattern>
+        </encoder>
+        <!-- LevelFilter 级别过滤器，根据日志级别进行过滤。如果日志级别等于配置级别，过滤器会根据onMath 和 onMismatch接收或拒绝日志。
+             ThresholdFilter 临界值过滤器，过滤掉低于指定临界值的日志。当日志级别等于或高于临界值时，过滤器返回NEUTRAL；当日志级别低于临界值时，日志会被拒绝。-->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <root level="INFO">
+        <!-- 生产不往控制台打日志，需要注销掉console输出 -->
+        <appender-ref ref="console"/>
+        <appender-ref ref="info"/>
+        <appender-ref ref="warnAndError"/>
+    </root>
+
+</configuration>

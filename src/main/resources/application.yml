@@ -4,10 +4,6 @@ server:
 
 filePath: D:\\temp\\caiwei.mp4
 
-logging:
-  level:
-    org.springframework.boot: info
-    org.apache.ibatis: info
 
 spring:
   application:
