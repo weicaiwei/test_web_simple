@@ -33,7 +33,7 @@ public class TestController {
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(3);
 
-    @GetMapping("test1")
+    @GetMapping("test1/cmbc.mp4")
     public String test1(@RequestParam String param1, @RequestParam String param2) {
         log.debug("param1[{}],param2[{}]", param1, param2);
 

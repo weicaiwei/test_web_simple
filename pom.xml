@@ -98,6 +98,39 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            <plugin>
+                <!--maven jar 插件-->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>2.6</version>
+                <executions>
+                    <execution>
+                        <!--id标识-->
+                        <id>dairy-pojo</id>
+                        <!--什么时候执行操作（package：打包， 表示是打包阶段执行）-->
+                        <phase>package</phase>
+                        <!--执行什么操作(打jar包操作)-->
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                        <!--执行操作配置-->
+                        <configuration>
+                            <!--分类-->
+                            <classifier>dubbo</classifier>
+                            <!--最终生成的jar包名称，如果没有设置，默认就是当前项目名字-->
+                            <jarName>test</jarName>
+                            <!--操作范围，将哪些内容包含进来打包，相反的还有个excludes标签-->
+                            <includes>
+                                <include>**/dubbo/**</include>
+                            </includes>
+                            <excludes>
+                                <exclude>**/dubbo/provider/impl/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

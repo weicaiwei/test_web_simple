@@ -1,6 +1,7 @@
 package com.caiwei.common.test.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -16,6 +17,7 @@ public class SMSService {
 
     private ExecutorService threadPool = Executors.newFixedThreadPool(1);
 
+    @Transactional
     public void sendMessage(String toPhone, String message) {
         threadPool.submit(()->{
             try {

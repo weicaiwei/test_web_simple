@@ -56,6 +56,7 @@ public class SessionController {
 
         System.out.println("before getSession,sessionId:" + request.getRequestedSessionId());
         HttpSession session = request.getSession();
+        session.setAttribute("userId",request.getParameter("userId"));
         String sessionId = session.getId();
         System.out.println("after getSession,sessionId:" + session.getId());
 
